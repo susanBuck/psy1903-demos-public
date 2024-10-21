@@ -31,7 +31,7 @@ export async function createGiftCard() {
         const creationRequestResponse = await client.createGiftCard({
             creationRequestId: uniqueRequestId,
             amount: 5,
-            currencyCode: 'USD', // JPY
+            currencyCode: 'USD',
         });
 
         // Log the response

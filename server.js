@@ -27,10 +27,6 @@ findFreePort(3000, (err, freePort) => {
         res.sendFile(path.join(__dirname, 'docs', 'index.html'));
     });
 
-    app.get('/reddit', (req, res) => {
-        res.json({ success: 1 });
-    })
-
     /**
      * POST /save
      */
@@ -58,12 +54,13 @@ findFreePort(3000, (err, freePort) => {
      * POST /gift-card
      */
     app.post('/gift-card', async (req, res) => {
+
         try {
-            const response = await createGiftCard();
+            let response = await createGiftCard();
             res.json(response);
         } catch (error) {
             console.error('Error creating gift card:', error);
-            res.status(500).send('Error creating gift card');
+            res.status(500).send('Error creating gift card.');
         }
     });
 
@@ -72,11 +69,11 @@ findFreePort(3000, (err, freePort) => {
     */
     app.post('/query-reddit', async (req, res) => {
         try {
-            const response = await queryReddit();
+            let response = await queryReddit(req.body);
             res.json(response);
         } catch (error) {
-            console.error('Error ', error);
-            res.status(500).send('Error');
+            console.error('Error querying reddit', error);
+            res.status(500).send('Error querying reddit.');
         }
     });
 

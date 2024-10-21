@@ -8,19 +8,49 @@
     <link href=data:, rel=icon>
     <script src='app.js' defer></script>
 
+    <link href='styles.css' rel='stylesheet'>
+    <link href='/assets/shared-styles.css' rel='stylesheet'>
+
 </head>
 
 <body>
 
-    <h1>Reddit Demo</h1>
+    <h1>Reddit Sentiment Analysis Demo</h1>
 
-    <label for='subreddit'>Subreddit:</label>
-    <input type='text' name='subreddit' id='subreddit'>
+    <div id='about' class='block'>
+        <ul>
+            <li>This app uses <a href='https://github.com/thisandagain/sentiment'>Sentiment</a>, a Node.js module that uses the <a href='https://www2.imm.dtu.dk/pubdb/pubs/6010-full.html'>AFINN-165 wordlist</a> and <a href='https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0144296'>Emoji Sentiment Ranking</a> to perform a sentiment analysis on the text of Reddit posts found by querying a specific search term in a specific "subreddit" (Reddit-specific subforum).
 
-    <label for='query'>Query:</label>
-    <input type='text' name='query' id='query'>
+            <li>Sentiment analysis is a natural language processing (NLP) technique used to determine the emotional tone or attitude expressed in a piece of text. It is often used to classify text as positive, negative, or neutral based on the sentiment it conveys.
 
-    <button id='searchButton'>Search</button>
+            <li>AFINN is a list of words rated for valence with an integer between minus five (negative) and plus five (positive). Sentiment analysis is performed by cross-checking the words with the AFINN list and getting their respective scores. The comparative score is sum of each token / number of tokens. (<a href='https://github.com/thisandagain/sentiment?tab=readme-ov-file#afinn'>ref</a>)
+        </ul>
+    </div>
+
+    <div id='input' class='block'>
+        <form id='inputForm'>
+            <div>
+                <label for='subreddit'>Subreddit:</label>
+                <input type='text' name='subreddit' id='subreddit' value='sleep'>
+                <small>Visit <a href='https://www.reddit.com/subreddits/'>/subreddits</a> for a list of subreddits to choose from</small>
+            </div>
+
+            <div>
+                <label for='query'>Query:</label>
+                <input type='text' name='query' id='query' value='phone'>
+            </div>
+
+            <div>
+                <label for='query'>Limit</label>
+                <input type='text' name='limit' id='limit' value='25'>
+            </div>
+
+            <button id='searchButton'>Run Query</button>
+        </form>
+    </div>
+
+    <div class='loader' id='loader'></div>
+    <div id='results' class='block'></div>
 
 </body>
 
