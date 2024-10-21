@@ -1,0 +1,16 @@
+.giftCardImage {
+    border-radius: 20px;
+}
+
+.giftCardCode {
+    top: -90px;
+    position: relative;
+    width: 300px;
+    margin: auto;
+    background-color: white;
+    color: black;
+    border-radius: 2px;
+    font-size: 25px;
+    font-family: consolas;
+    padding: 10px;
+}
