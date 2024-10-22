@@ -1,64 +1,47 @@
-let querystring = require('querystring');
-let https = require('https');
+import { config } from 'dotenv';
+config();
 
-let host = 'survey.qualtrics.com';
-let username = '';
-let token = '';
-let sessionId = null;
-let survey_id = '';
+import querystring from 'querystring';
+import https from 'https';
 
-function performRequest(endpoint, method, data, success) {
-    let dataString = JSON.stringify(data);
+let token = process.env.QUALTRICS_API_TOKEN;
+let surveyId = 'SV_ekV0pVH9xqAoOb4';
 
-    let headers = {};
+let headers = {
+    'Content-Type': 'application/json',
+    'X-API-TOKEN': token,
+};
 
-    if (method == 'GET') {
-        endpoint += '?' + querystring.stringify(data);
-    }
-    else {
-        headers = {
-            'Content-Type': 'application/json',
-            'Content-Length': dataString.length
-        };
-    }
-    let options = {
-        hostname: host,
-        path: endpoint,
-        method: method,
-        headers: headers
-    };
+let options = {
+    hostname: 'pdx1.qualtrics.com',
+    path: '/API/v3/surveys/' + surveyId,
+    method: 'GET',
+    headers: headers
+};
 
-    let req = https.request(options, function (res) {
-        res.setEncoding('utf-8');
+console.log('options:', options);
 
-        let responseString = '';
+let data = JSON.stringify({
+    surveyId: surveyId,
+    // Add other data fields here
+});
 
-        res.on('data', function (data) {
-            responseString += data;
-        });
+let req = https.request(options, function (res) {
+    res.setEncoding('utf-8');
 
-        res.on('end', function () {
-            console.log(responseString);
-            let responseObject = JSON.parse(responseString);
-            success(responseObject);
-        });
+    let responseString = '';
+
+    res.on('data', function (data) {
+        responseString += data;
     });
 
-    req.write(dataString);
-    req.end();
-}
+    res.on('end', function () {
+        let responseObject = JSON.parse(responseString);
+        console.log('Response:', responseObject);
 
-function getSurveyName() {
-    performRequest('/WRAPI/ControlPanel/api.php', 'GET', {
-        Request: 'getSurvey',
-        SurveyID: survey_id,
-        User: username,
-        Token: token,
-        Version: '2.3',
-        Format: 'JSON'
-    }, function (data) {
-        console.log('Fetched ' + data.result);
     });
-}
+});
 
-getSurveyName();
+req.write(data);
+req.end();
+
