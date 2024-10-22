@@ -8,12 +8,17 @@ dotenv.config();
 export async function createGiftCard() {
 
     // Load environment variables
+    // https://www.amazon.com/gc/corp/account/keys/sandbox
     const secretAccessKey = process.env.AMAZON_SECRET_ACCESS_KEY;
     const accessKeyId = process.env.AMAZON_ACCESS_KEY_ID;
     const partnerId = process.env.AMAZON_PARTNER_ID;
 
     // Endpoint configuration
-    const endpoint = { host: 'agcod-v2-gamma.amazon.com', region: 'us-east-1' };
+    // https://developer.amazon.com/docs/incentives-api/incentives-api.html#sandbox-endpoints
+    const endpoint = {
+        host: 'agcod-v2-gamma.amazon.com',
+        region: 'us-east-1'
+    };
 
     // Initialize IncentivesAPI client
     const client = new IncentivesAPI({
@@ -44,25 +49,3 @@ export async function createGiftCard() {
         throw error;
     }
 }
-
-/**
- * 
- */
-async function getAvailableFunds() {
-    try {
-        let availableFundsResponse = await client.getAvailableFunds();
-        console.log(availableFundsResponse);
-    } catch (error) {
-        console.error('Error fetching available funds:', error);
-    }
-}
-// getAvailableFunds();
-
-
-
-
-// Scratchpad:
-// https://s3.amazonaws.com/AGCOD/htmlSDKv2/htmlSDKv2_NAEUFE/index.html
-
-// AGCOD Credentials Sandbox:
-// https://www.amazon.com/gc/corp/account/keys/sandbox
