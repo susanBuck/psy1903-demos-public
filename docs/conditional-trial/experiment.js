@@ -1,10 +1,8 @@
 let jsPsych = initJsPsych();
 let timeline = [];
 
-
-
 /**
- * Debrief
+ * Welcome
  */
 let welcomeTrial = {
     type: jsPsychHtmlKeyboardResponse,
@@ -19,25 +17,7 @@ timeline.push(welcomeTrial);
 
 
 /**
- * jsPsych plugin: "call-function" https://www.jspsych.org/latest/plugins/call-function/
- * This plugin allows us to run arbitrary code - we use it here to add a property to our experiment data
- * called "showPrime" that is either 0 (false) or 1 (true). 
- * Then, in the next trial (primeTrial), we look for this property and if it's false, we skip that trial
- */
-let prePrimeTrial = {
-    type: jsPsychCallFunction,
-    func: function () {
-        jsPsych.data.addProperties({
-            showPrime: getRandomNumber(0, 1)
-        })
-    }
-}
-timeline.push(prePrimeTrial);
-
-
-
-/**
- * 
+ * This trial will be skipped at random
  */
 let primeTrial = {
     type: jsPsychHtmlKeyboardResponse,
@@ -47,12 +27,7 @@ let primeTrial = {
         `,
     choices: [' '],
     on_load: function () {
-
-        // Retrieve the data from the previous trial (prePrimeTrial)
-        let lastTrialData = jsPsych.data.get().last(1).values()[0];
-
-        // If showPrime was 0 (false), skip this trial
-        if (lastTrialData.showPrime == false) {
+        if (getRandomNumber(0, 1) == 0) {
             jsPsych.finishTrial();
         }
     },
