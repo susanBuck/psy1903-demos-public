@@ -1,6 +1,3 @@
-// https://api.qualtrics.com/1179a68b7183c-retrieve-a-survey-response
-// https://harvard.pdx1.qualtrics.com/admin/account-settings-portal/user-settings
-
 import { config } from 'dotenv';
 config();
 
@@ -9,7 +6,6 @@ import https from 'https';
 
 let token = process.env.QUALTRICS_API_TOKEN;
 let surveyId = 'SV_ekV0pVH9xqAoOb4';
-let responseId = 'R_11tSkZCCYy776iq';
 
 let headers = {
     'Content-Type': 'application/json',
@@ -18,7 +14,7 @@ let headers = {
 
 let options = {
     hostname: 'pdx1.qualtrics.com',
-    path: '/API/v3/surveys/' + surveyId + '/responses/' + responseId,
+    path: '/API/v3/surveys/' + surveyId,
     method: 'GET',
     headers: headers
 };
