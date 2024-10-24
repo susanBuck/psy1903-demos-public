@@ -1,0 +1,15 @@
+.box {
+    float: left;
+    display: flex;
+    align-items: center;
+    /* Vertically center the content */
+    justify-content: center;
+    /* Horizontally center the content (optional) */
+    width: 375px;
+    height: 375px;
+    font-size: 100px;
+}
+
+.cue {
+    border: 1px solid black;
+}
