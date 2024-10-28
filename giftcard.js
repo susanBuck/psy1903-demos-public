@@ -1,3 +1,4 @@
+// https://developer.amazon.com/docs/incentives-api/incentives-api.html
 import { IncentivesAPI } from 'amazon-incentives-api';
 import dotenv from 'dotenv';
 
@@ -9,19 +10,19 @@ export async function createGiftCard() {
 
     // Load environment variables
     // https://www.amazon.com/gc/corp/account/keys/sandbox
-    const secretAccessKey = process.env.AMAZON_SECRET_ACCESS_KEY;
-    const accessKeyId = process.env.AMAZON_ACCESS_KEY_ID;
-    const partnerId = process.env.AMAZON_PARTNER_ID;
+    let secretAccessKey = process.env.AMAZON_SECRET_ACCESS_KEY;
+    let accessKeyId = process.env.AMAZON_ACCESS_KEY_ID;
+    let partnerId = process.env.AMAZON_PARTNER_ID;
 
     // Endpoint configuration
     // https://developer.amazon.com/docs/incentives-api/incentives-api.html#sandbox-endpoints
-    const endpoint = {
+    let endpoint = {
         host: 'agcod-v2-gamma.amazon.com',
         region: 'us-east-1'
     };
 
     // Initialize IncentivesAPI client
-    const client = new IncentivesAPI({
+    let client = new IncentivesAPI({
         accessKeyId: accessKeyId,
         secretAccessKey: secretAccessKey,
         partnerId: partnerId,
@@ -30,10 +31,10 @@ export async function createGiftCard() {
 
     try {
         // Generate a unique request ID
-        const uniqueRequestId = partnerId + Date.now();
+        let uniqueRequestId = partnerId + Date.now();
 
         // Create the gift card
-        const creationRequestResponse = await client.createGiftCard({
+        let creationRequestResponse = await client.createGiftCard({
             creationRequestId: uniqueRequestId,
             amount: 5,
             currencyCode: 'USD',

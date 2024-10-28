@@ -4,7 +4,6 @@
 import { config } from 'dotenv';
 config();
 
-import querystring from 'querystring';
 import https from 'https';
 
 let token = process.env.QUALTRICS_API_TOKEN;

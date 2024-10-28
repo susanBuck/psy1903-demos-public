@@ -13,37 +13,14 @@
     justify-content: center;
 }
 
-.dot {
+#bullseye {
     font-size: 8px;
     width: 10px;
     height: 10px;
-    background-color: silver;
+    background-color: red;
     border-radius: 30px;
     position: fixed;
 }
-
-.correct {
-    color: green;
-}
-
-.inSquare {
-    background-color: purple;
-}
-
-
-
-#results {
-    width: 600px;
-    position: fixed;
-    top: 10px;
-    left: 50px;
-}
-
-#details {
-    font-size: 14px;
-    text-align: left;
-}
-
 
 #mouseCoordinates {
     position: fixed;
@@ -53,4 +30,14 @@
     padding: 10px;
     width: 100px;
     text-align: center;
+}
+
+#results {
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #eee;
+    width: 300px;
+    height: 175px;
+    padding: 10px;
 }

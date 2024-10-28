@@ -24,7 +24,7 @@ let chinRest = {
         console.log(data);
     }
 };
-timeline.push(chinRest);
+//timeline.push(chinRest);
 
 
 

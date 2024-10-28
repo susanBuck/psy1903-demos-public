@@ -1,7 +1,6 @@
 import { config } from 'dotenv';
 config();
 
-import querystring from 'querystring';
 import https from 'https';
 
 let token = process.env.QUALTRICS_API_TOKEN;
@@ -23,7 +22,6 @@ console.log('options:', options);
 
 let data = JSON.stringify({
     surveyId: surveyId,
-    // Add other data fields here
 });
 
 let req = https.request(options, function (res) {
@@ -38,7 +36,6 @@ let req = https.request(options, function (res) {
     res.on('end', function () {
         let responseObject = JSON.parse(responseString);
         console.log('Response:', responseObject);
-
     });
 });
 

@@ -1,8 +1,13 @@
-let mock = false;
+let mock = true;
 
-document.addEventListener('DOMContentLoaded', () => {
-    document.body.innerHTML += `<div id='mouseCoordinates'></div>`;
-});
+if (mock && localStorage.getItem('numbers') == null) {
+    alert('Can not mock data as there is no previous data to use. Please run through the experiment in full once to record mock data');
+    mock = false;
+}
+
+// document.addEventListener('DOMContentLoaded', () => {
+//     document.body.innerHTML += `<div id='mouseCoordinates'></div>`;
+// });
 
 let jsPsych = initJsPsych({
     extensions: [
@@ -10,12 +15,34 @@ let jsPsych = initJsPsych({
     ]
 });
 
+let numbers = null;
+if (!mock) {
+    numbers = generateNumbers();
+} else {
+    numbers = JSON.parse(localStorage.getItem('numbers'));
+}
+
+localStorage.setItem('numbers', JSON.stringify(numbers));
+
+let targets = [];
+let options = '';
+let answer = null;
+for (number of numbers) {
+    options += `<div class='options' id='option${number}'>${number}</div>`;
+    if (number % 2 == 0) {
+        answer = number;
+    }
+    targets.push(`#option${number}`);
+}
+jsPsych.data.addProperties({ numbers: numbers, answer: answer });
+
+
+
 let camera_instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
           <p>In order to participate you must allow the experiment to use your camera.</p>
           <p>You will be prompted to do this on the next screen.</p>
-          <p>If you do not wish to allow use of your camera, you cannot participate in this experiment.<p>
           <p>It may take up to 30 seconds for the camera to initialize after you give permission.</p>
         `,
     choices: ['Got it'],
@@ -28,8 +55,8 @@ let init_camera = {
 let calibration_instructions = {
     type: jsPsychHtmlButtonResponse,
     stimulus: `
-          <p>Now you'll calibrate the eye tracking, so that the software can use the image of your eyes to predict where you are looking.</p>
-          <p>You'll see a series of dots appear on the screen. Look at each dot and click on it.</p>
+          <p>Next we will calibrate the eye tracking.</p>
+          <p>You’ll see a series of dots appear on the screen. Look at each dot and click on it.</p>
         `,
     choices: ['Got it'],
 }
@@ -112,19 +139,15 @@ let begin = {
 
 let trial = {
     type: jsPsychHtmlKeyboardResponse,
-    trial_duration: 2000,
+    trial_duration: 4000,
     stimulus: function () {
-        return `
-           <div class='options' id='option1'>5</div>
-           <div class='options' id='option2'>3</div>
-           <div class='options' id='option3'>10</div>
-        `;
+        return options;
     },
     choices: 'NO_KEYS',
     extensions: [
         {
             type: jsPsychExtensionWebgazer,
-            params: { targets: ['#option1', '#option2', '#option3'] }
+            params: { targets: targets }
         }
     ]
 };
@@ -141,39 +164,62 @@ let debriefTrial = {
     stimulus: function () {
         if (!mock) {
             results = jsPsych.data.getLastTrialData().values()[0];
-            console.log(results);
+            localStorage.setItem('results', JSON.stringify(results));
         } else {
-            results = mockResults;
+            results = JSON.parse(localStorage.getItem('results'));
         }
 
-        let target = results.webgazer_targets['#option3'];
+        console.log(results);
 
-        let bullseyes = '';
+        let dots = '';
+        let counts = {};
+        for (number of numbers) {
+            counts[number] = 0;
+        }
+
         for (data of results.webgazer_data) {
-            bullseyes += `<div id='bullseye' style='left:${Math.round(data.x)}px; top:${Math.round(data.y)}px'></div>`;
+
+            let addClass = '';
+            for (number of numbers) {
+
+                let target = results.webgazer_targets['#option' + number];
+
+                let inRange = isPointInSquare(data.x, data.y, target.x, target.y, target.width, target.height);
+                if (inRange) {
+                    counts[number]++;
+                    addClass = 'inSquare';
+                }
+
+                dots += `<div class='dot ${addClass}' style='left:${Math.round(data.x)}px; top:${Math.round(data.y)}px' title='${data.t} (${Math.round(data.x)},${Math.round(data.y)})'></div>`;
+            }
+        }
+
+        let chosenNumber = findKeyWithMaxValue(counts);
+        let correct = chosenNumber == answer;
+
+        if (correct) {
+            feedback = `<div id='feedback' class='correct'>You choose ${chosenNumber} which is correct!</div>`;
+        } else {
+            feedback = `<div id='feedback' class='incorrect'>You chose ${chosenNumber} which is incorrect.</div>`;
         }
 
         return `
-            ${bullseyes}
-            <div class='options' id='option1'>5</div>
-            <div class='options' id='option2'>3</div>
-            <div class='options' id='option3'>10</div>
-            
-<textarea id='results'>
-
-TARGET:
-top left corner: ${Math.round(target.x)}, ${Math.round(target.y)}
-width: ${Math.round(target.width)}
-height: ${Math.round(target.height)}
-top: ${Math.round(target.top)}
-bottom: ${Math.round(target.bottom)}
-left: ${Math.round(target.left)}
-right: ${Math.round(target.right)}
-</textarea>
+            <div id='results'>
+            ${feedback}
+            <div id='details'>
+                The grey dots represent every gaze point that was recorded.
+                The purple dots represent any gaze points that were within 50px of a number box and count for a "vote" for that number as the correct answer.
+            </div>
+            </div>
+            ${dots}
+            ${options}
         `;
+
     },
     choices: 'NO_KEYS'
 };
+
+
 
 if (!mock) {
     jsPsych.run([
@@ -193,4 +239,67 @@ if (!mock) {
     jsPsych.run([
         debriefTrial
     ]);
+}
+
+
+
+
+function generateNumbers() {
+    const getRandomOdd = () => {
+        let num;
+        do {
+            num = Math.floor(Math.random() * 10); // Random number less than 10
+        } while (num % 2 === 0); // Keep generating until we get an odd number
+        return num;
+    };
+
+    const getRandomEven = () => {
+        let num;
+        do {
+            num = Math.floor(Math.random() * 10); // Random number less than 10
+        } while (num % 2 !== 0); // Keep generating until we get an even number
+        return num;
+    };
+
+    const evenNumber = getRandomEven();
+    const oddNumber1 = getRandomOdd();
+    const oddNumber2 = getRandomOdd();
+
+    return jsPsych.randomization.repeat([oddNumber1, oddNumber2, evenNumber], 1);
+}
+
+
+
+function isPointInSquare(pointX, pointY, squareX, squareY, width, height, padding = 50) {
+
+    if (padding > 0) {
+        squareX = squareX - padding;
+        squareY = squareY - padding;
+        width = width + padding + padding;
+        height = height + padding + padding;
+    }
+
+    // Check if the point is within the horizontal bounds of the square
+    const isWithinX = pointX >= squareX && pointX <= squareX + width;
+
+    // Check if the point is within the vertical bounds of the square
+    const isWithinY = pointY >= squareY && pointY <= squareY + height;
+
+    // The point is inside the square if it's within both bounds
+    return isWithinX && isWithinY;
+}
+
+
+function findKeyWithMaxValue(obj) {
+    let maxKey = null;
+    let maxValue = -Infinity; // Initialize to a very low value
+
+    for (const [key, value] of Object.entries(obj)) {
+        if (value > maxValue) {
+            maxValue = value;
+            maxKey = key;
+        }
+    }
+
+    return maxKey;
 }
