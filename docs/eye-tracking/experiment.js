@@ -131,7 +131,7 @@ let begin = {
     choices: [' '],
     stimulus: `
         <p>On the next screen you will see three numbers.</p>
-        <p>Two of the numbers will be EVEN and one will be ODD.</p>
+        <p>Two of the numbers will be ODD and one will be EVEN.</p>
         <p>Look at the EVEN number until the numbers are no longer present.</p>
         <p>Press the <span class='key'>SPACE</span> key to start.</p>
         `
