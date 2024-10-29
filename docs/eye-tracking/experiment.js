@@ -1,4 +1,4 @@
-let mock = true;
+let mock = false;
 
 if (mock && localStorage.getItem('numbers') == null) {
     alert('Can not mock data as there is no previous data to use. Please run through the experiment in full once to record mock data');
