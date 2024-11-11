@@ -1,0 +1,11 @@
+﻿participant,positiveEmotion,negativeEmotion,rt,moodGroup
+P01,2,6,744,negativeMood
+P02,4,5,846,negativeMood
+P03,8,4,497,positiveMood
+P04,7,4,308,positiveMood
+P05,9,3,457,positiveMood
+P06,8,2,575,positiveMood
+P07,1,8,721,negativeMood
+P08,10,1,509,positiveMood
+P09,NA,9,862,negativeMood
+P10,3,7,654,negativeMood
