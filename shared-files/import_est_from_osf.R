@@ -12,7 +12,7 @@ p_load("httr", "jsonlite", "fs", "stringr", "lubridate")
 NODE         <- "crbtp"                         # your OSF component ID
 PREFIX       <- "est-experiment"                # only download files matching this prefix
 CUTOFF_DATE  <- lubridate::ymd("2025-11-01")    # only files modified AFTER this date
-DATA_DIR     <- "data/raw"                      # destination folder
+DATA_DIR     <- "../data/raw"                   # destination folder
 
 ## Optional for PRIVATE components (leave undefined for public):
 ## TOKEN <- "paste_your_OSF_personal_access_token_here"
