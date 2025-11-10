@@ -2,7 +2,7 @@
 ## Purpose: Download Emotional Stroop CSVs from OSF into data/raw/
 
 if (!require("pacman")) {install.packages("pacman"); require("pacman")}
-p_load("httr", "jsonlite", "fs", "stringr", "lubridate")
+p_load("httr", "jsonlite", "fs", "stringr", "lubridate", "here")
 
 ## ----------------------------- CONFIG ---------------------------------------
 NODE         <- "crbtp"
