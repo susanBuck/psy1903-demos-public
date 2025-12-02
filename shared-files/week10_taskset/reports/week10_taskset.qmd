@@ -1,0 +1,164 @@
+---
+title: "Week 10 Task Set"
+author: "Garth Coombs"
+format: html
+execute:
+  echo: true
+  warning: true
+  message: true
+---
+
+#### Load and Inspect Data ----------------------------------------------------
+
+```{r}
+# Load the saved dataset
+experiment_data <- readRDS("../data/raw/experiment_data.rds")
+
+# Take a quick look at the first few rows
+head(experiment_data)
+
+# Check the structure of the dataset
+str(experiment_data)
+```
+#### Functions ----------------------------------------------------
+
+```{r}
+## Generate one or more random numbers between min and max (defaults: one number between 1–10)
+getRandomNumber <- function(min = 1, max = 10, number = 1) {
+  sample(min:max, number)
+}
+```
+
+```{r}
+## Classify reaction times into "Fast", "Slow", or "Unknown" (default threshold = 500ms)
+classify_rt <- function(rt, threshold = 500) {
+  if (!is.numeric(threshold) || length(threshold) != 1) {
+    stop("Error: 'threshold' must be a single numeric value.")
+  }
+  if (!is.numeric(rt)) {
+    stop("Error: 'rt' must be numeric.")
+  } 
+  
+  category <- ifelse(
+    is.na(rt), "Unknown",
+    ifelse(rt < threshold, "Fast", "Slow")
+  )
+  
+  return(category)
+}
+```
+
+#### Q3: Loops vs. Vectorization -----------------------------
+
+## Q3.1 - 3.3 Loop & Vectorized $age
+```{r}
+experiment_data$age <- NA
+
+for (i in 1:nrow(experiment_data)) {
+  experiment_data[i, "age"] <- getRandomNumber(18, 65, 1)
+}
+
+head(experiment_data)
+
+experiment_data$age <- sample(18:65, nrow(experiment_data), replace = TRUE)
+```
+
+#### Q4: Control Structures on Data Frames ---------------------------
+
+## Q4.1
+```{r}
+experiment_data$rt_category_loop <- NA
+
+for (i in 1:nrow(experiment_data)) {
+      experiment_data[i, "rt_category_loop"] <- classify_rt(experiment_data[i, "rt"])
+  }
+```
+
+## Q4.2
+```{r}
+experiment_data$rt_category_vec <- NA
+experiment_data$rt_category_vec <- sapply(experiment_data$rt, classify_rt)
+
+experiment_data$rt_category_vec2 <- NA
+experiment_data$rt_category_vec2 <- classify_rt(experiment_data$rt)
+```
+
+## Q4.3
+```{r}
+table(loop = experiment_data$rt_category_loop,
+      vec  = experiment_data$rt_category_vec,
+      useNA = "ifany")
+```
+
+#### Q5: Debugging Functions -----------------------------
+## Q5.1
+```{r}
+## Create Buggy Function
+threshold <- 500
+
+flag_fast <- function(rt_vector) {
+  rt_vector < threshold
+}
+
+flag_fast(experiment_data$rt)
+```
+
+## Q5.2
+```{r}
+# rm(threshold)
+
+# flag_fast(experiment_data$rt)
+```
+
+## Q5.3
+```{r}
+flag_fast <- function(rt_vector, threshold = 500) {
+  rt_vector < threshold
+}
+
+flag_fast(experiment_data$rt)
+```
+
+#### Q6: Debugging Tools in Action -----------------------------
+## Q6.1
+```{r}
+subject_means <- tapply(experiment_data$rt,
+                        experiment_data$condition,
+                        mean)
+print(paste("Mean for control:", subject_means["control"]))
+print(paste("Mean for incongruent:", subject_means["incongruent"]))
+```
+
+## Q6.2
+```{r}
+# How many NAs overall?
+sum(is.na(experiment_data$rt))
+
+# How many NAs by condition?
+tapply(is.na(experiment_data$rt), experiment_data$condition, sum)
+
+# Optional: quick sanity checks
+summary(experiment_data$rt)
+with(experiment_data, table(condition, is.na(rt)))
+```
+
+## Q6.3
+```{r}
+subject_means <- tapply(experiment_data$rt,
+                        experiment_data$condition,
+                        mean, na.rm = TRUE)
+print(paste("Mean for control:", subject_means["control"]))
+print(paste("Mean for incongruent:", subject_means["incongruent"]))
+```
+#### Q8: Saving and Reloading Objects -----------------------------
+## Q8.1
+```{r}
+write.csv(experiment_data, "../data/cleaned/experiment_data.csv", row.names = FALSE)
+
+saveRDS(experiment_data, "../data/cleaned/experiment_data.rds")
+```
+
+## Q8.2
+```{r}
+save(experiment_data, subject_means, file = "../data/cleaned/objects.RData")
+```

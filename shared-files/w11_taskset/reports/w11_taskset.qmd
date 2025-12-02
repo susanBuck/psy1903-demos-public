@@ -1,0 +1,89 @@
+---
+title: "Week 11 Task Set"
+author: "Garth Coombs"
+format: html
+execute:
+  echo: true
+  warning: true
+  message: false
+---
+This report documents how we import and process each participant’s raw data file, summarize it using our functions, and combine the results into a single study-level dataset.
+
+My workflow involved importing the files, recovering missing RTs when possible, converting the accuracy values, scoring the ESQ, and then creating a final summary data frame. For missing data, I isolated trials where everything was missing and trials where RT was missing but the timestamps were available. Those RTs were recovered by subtracting the stimulus onset from the response time, and the rest were kept as true missing values (`NA`). This improves data quality and reproducibility because:
+1. It allows us to include more trials in the analyses, while still excluding truly missing values.
+2. The rules are consistently applied to all trials for all participants
+3. Other people can follow the same steps and get the same results.
+
+---
+
+#### Concept Check
++ Q1: What does `source("scripts/score_questionnaire.R")` enable in your workflow?
+  + Your answer here
++ Q2: Why is modularizing your code into multiple scripts considered a best practice?
+  + Your answer here
++ Q3: What information does `traceback()` provide after an error?
+  + Your answer here
++ Q4: When you read multiple `.csv` files into R, how can using `str()` or `names()` before combining them help you prevent or debug errors later in your workflow?
+  + Your answer here
++ Q5: When you run `source("scripts/process_participant.R")` inside your Quarto document, nothing prints in the Console. How can you check whether your function actually loaded correctly into your environment, and why is this step important before calling it in later code?
+  + Your answer here
+---
+
+#### Load packages ------------------------------------------------------------
+```{r}
+if (!require("pacman")) {install.packages("pacman"); require("pacman")}
+p_load("jsonlite", "ggplot2", "here")
+```
+---
+
+#### Load functions ------------------------------------------------------------
+```{r}
+source(here::here("scripts/score_questionnaire.R"))
+source(here::here("scripts/summarize_behavior.R"))
+source(here::here("scripts/process_participant.R"))
+source(here::here("scripts/compute_rt_if_missing.R"))
+```
+---
+
+#### Process Individual Files and Combine into Study Level Data Frame
+1) Find files 
+```{r}
+file_list <- list.files(
+  here::here("data", "raw"),
+  pattern = "^est-experiment-.*\\.csv$",
+  full.names = FALSE
+)
+```
+
+2) Apply our participant processor 
+```{r}
+participant_rows <- lapply(file_list, process_participant)
+```
+
+3) Combine into one study-level data frame 
+```{r}
+study_level <- do.call(rbind, participant_rows)
+
+## Rename column names without behavior. prefix
+names(study_level) <- gsub("^behavior\\.", "", names(study_level))
+```
+
+
+---
+#### Inspect Data
+```{r}
+str(study_level)
+summary(study_level)
+print(study_level)
+```
+The mean RT across the study is `r round(mean(study_level$mean_rt_correct, na.rm = TRUE), 2)` ms, and the mean accuracy is `r round(mean(study_level$mean_accuracy, na.rm = TRUE)*100, 1)`%.
+
+The mean RT for positive trials is `r round(mean(study_level$mean_rt_positive, na.rm = TRUE), 2)` ms.
+
+The mean RT for negative trials is `r round(mean(study_level$mean_rt_negative, na.rm = TRUE), 2)` ms. 
+
+The mean RT for neutral trials is  `r round(mean(study_level$mean_rt_neutral, na.rm = TRUE), 2)` ms.
+
+Neutral trials showed the fastest responses, followed by positive trials and then negative trials. This pattern suggests that the emotional content of the words slowed people down, and that negative words created the most interference.
+
+
